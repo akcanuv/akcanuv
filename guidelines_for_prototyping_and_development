@@ -1,0 +1,71 @@
+# AKC ANUV: Guidelines for Prototyping and Development
+
+At AKC ANUV, the first priority when innovating is to build quick prototypes of ideas. However, maintaining code quality and adhering to best practices is equally important. Follow these guidelines to ensure consistent and efficient development.
+
+---
+
+## Version Control with Git
+### Learn Git
+If you have never used Git before, **learn Git**. Git is arguably the best version control tool invented. It allows detailed tracking of changes in all files within a repository. At **Buddhiyantra**, we use Git to collaborate effectively.  
+👉 *Git gud!*
+
+### Best Practices
+- **Use descriptive commit messages**  
+  Commit messages should communicate the development story. Each commit should represent a meaningful step toward your goal.
+  
+- **Commit often and sensibly**  
+  Commit after every small, significant achievement. Avoid combining unrelated changes in a single commit.
+
+- **Add common exclusions to `.gitignore`**  
+  Ensure files like `workdesk`, `.backup`, and `.DS_Store` are added to your `.gitignore`.
+
+---
+
+## Writing Clean and Understandable Code
+### Use Descriptive Names
+- Name variables meaningfully to reflect their role and context within the program.
+- Avoid ambiguous or single-letter names unless absolutely necessary.
+
+### Avoid Hardcoding
+- **Do not hardcode input parameters**  
+  Instead, set default values in your CLI interface. This ensures flexibility during testing and usage.
+  
+- **Never hardcode API keys**  
+  Always store API keys as environment variables.  
+  > **Note:** Never commit API keys to the repository. Even if removed later, they may still exist in the Git history.
+
+---
+
+## Command-Line Interfaces (CLI)
+- Use libraries like **`click`** or **`argparse`** to create CLI interfaces.
+- Make your programs easy to test and use without requiring users to modify the source code.
+
+---
+
+## Testing and Resources
+- Provide test samples or examples in a `resources` directory in your Git repository.
+- Output results to a designated folder named `workdesk`.
+
+---
+
+## Leveraging AI Tools
+- Use AI tools to enhance productivity. Think creatively about how AI can support your tasks.
+- Let AI assist with your ideas, but you must always provide the base concept and guide the process.
+  
+---
+
+## Additional Notes
+### Enable Quick Testing
+- Provide a set of sample input and output files to simplify testing.
+
+### Keep the Repository Organized
+- Maintain a clean directory structure for resources, outputs, and backups.
+
+---
+
+### Summary of Essentials
+- **Git:** Version control with proper commit messages and `.gitignore`.
+- **Code Quality:** Descriptive variable names, no hardcoding of inputs or API keys.
+- **CLI:** Implement interfaces with `click` or `argparse`.
+- **Testing:** Use a `resources` directory and output to `workdesk`.
+- **AI Tools:** Incorporate AI into your workflow for better efficiency.
