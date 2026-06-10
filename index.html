@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Engineering, elevated.</title>
+<meta name="description" content="AKC ANUV — civil &amp; structural design consultancy. Advanced AI applied to the design and delivery of public civil infrastructure. Bridges, metro viaducts and the structures a country runs on." />
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════════════════════════════════════════
+   AKC ANUV — Landing page, set as an engineering-drawing SHEET SET.
+   House style v1.1, live: white paper, hairline rules, square corners,
+   one navy/blue accent, no shadows on our chrome, `rise` motion, and a
+   scroll-snap deck so the page reads as drawing sheets, not a scroll.
+   ════════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* palette — matched to the design language + the pier-cap drawing */
+  --paper:#ffffff;
+  --g50:#f9fafb; --g100:#f3f4f6; --g200:#dce0e4; --g300:#d1d7db;
+  --g400:#9ca6af; --g500:#6b7580; --g600:#4b5963; --g700:#374551;
+  --ink:#111c27; --ink-2:#1f2d37;
+  --accent:#1962b4; --accent-deep:#1a548e; --accent-soft:#5acbff;
+  --navy:#14315c;             /* the logo navy */
+  --sage:#4d6b4a;             /* status · ongoing */
+  --amber:#8a5a1f;            /* status · under review */
+
+  --font-display:"Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, monospace;
+
+  --tw1:0.08em; --tw2:0.14em; --tw3:0.2em;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --d1:120ms; --d2:160ms; --dr:560ms;
+
+  --pad:clamp(20px,3.4vw,46px);   /* sheet outer padding */
+}
+
+*{box-sizing:border-box; border-radius:0 !important;}
+/* the deck — the document root is the scroll-snap container (sheets stack to 4×100vh).
+   smooth scrolling is handled per-interaction in JS so deep-links jump instantly. */
+html{ scroll-snap-type:y mandatory; }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--font-sans); font-size:13px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; text-rendering:geometricPrecision;
+  font-feature-settings:"ss01","cv11";
+  overflow-x:hidden;
+}
+::selection{ background:var(--accent); color:var(--paper); }
+::-webkit-scrollbar{ width:9px; height:9px; }
+::-webkit-scrollbar-thumb{ background:var(--g200); }
+::-webkit-scrollbar-thumb:hover{ background:var(--g400); }
+::-webkit-scrollbar-track,::-webkit-scrollbar-corner{ background:transparent; }
+*{ scrollbar-color:var(--g200) transparent; scrollbar-width:thin; }
+a{ color:inherit; text-decoration:none; }
+
+/* ── type utilities ── */
+.display{ font-family:var(--font-display); font-weight:500; letter-spacing:-0.02em; line-height:0.95; }
+.mono{ font-family:var(--font-mono); }
+.num{ font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; }
+.label{ font-family:var(--font-sans); font-size:10px; letter-spacing:var(--tw1); text-transform:uppercase; color:var(--g500); font-weight:500; }
+.sq{ display:inline-block; width:8px; height:8px; flex:none; }
+
+/* ── drawing primitives ── */
+.crop{ position:absolute; width:14px; height:14px; border:0 solid var(--g400); opacity:.8; pointer-events:none; z-index:3; }
+.crop.tl{ top:-1px; left:-1px; border-top-width:1px; border-left-width:1px; }
+.crop.tr{ top:-1px; right:-1px; border-top-width:1px; border-right-width:1px; }
+.crop.bl{ bottom:-1px; left:-1px; border-bottom-width:1px; border-left-width:1px; }
+.crop.br{ bottom:-1px; right:-1px; border-bottom-width:1px; border-right-width:1px; }
+
+.bk{ position:relative; }
+.bk::before,.bk::after{ content:""; position:absolute; width:11px; height:11px; border:0 solid var(--accent); pointer-events:none; z-index:2; transition:opacity var(--d2); }
+.bk::before{ top:-1px; left:-1px; border-top-width:2px; border-left-width:2px; }
+.bk::after{ bottom:-1px; right:-1px; border-bottom-width:2px; border-right-width:2px; }
+
+.hatch{ background-image:repeating-linear-gradient(45deg, rgba(20,49,92,.12) 0, rgba(20,49,92,.12) 1px, transparent 1px, transparent 7px); }
+.dim{ position:relative; height:1px; background:var(--ink); }
+.dim::before,.dim::after{ content:""; position:absolute; top:-3px; width:1px; height:7px; background:var(--ink); }
+.dim::before{ left:0; } .dim::after{ right:0; }
+
+/* ── motion ── */
+@keyframes rise{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+@keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+.rise-stagger > *{ animation:rise .6s var(--ease) both; }
+.rise-stagger > *:nth-child(1){animation-delay:.05s}
+.rise-stagger > *:nth-child(2){animation-delay:.12s}
+.rise-stagger > *:nth-child(3){animation-delay:.19s}
+.rise-stagger > *:nth-child(4){animation-delay:.26s}
+.rise-stagger > *:nth-child(5){animation-delay:.33s}
+.rise-stagger > *:nth-child(6){animation-delay:.40s}
+.reveal{ opacity:0; transform:translateY(10px); transition:opacity .6s var(--ease), transform .6s var(--ease); }
+.reveal.in{ opacity:1; transform:none; }
+
+/* ════════════════ deck / sheets ════════════════ */
+.sheet{
+  position:relative; width:100%;
+  min-height:100vh; height:100vh;
+  scroll-snap-align:start; scroll-snap-stop:always;
+  padding:var(--pad);
+}
+.sheet-in{ position:relative; height:100%; border:1px solid var(--ink); background:var(--paper); }
+.sheet-in.lined{ display:flex; flex-direction:column; }
+
+/* faint drafting grid, hero only */
+.grid-bg{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(to right, rgba(17,28,39,.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,28,39,.035) 1px, transparent 1px);
+  background-size:30px 30px;
+}
+
+/* ════════════════ SHEET 01 · HERO ════════════════ */
+.hero .sheet-in{ overflow:hidden; }
+.hero-inner{ position:relative; height:100%; }
+
+/* the animated drawing — pure visualisation, large and centred, no frame */
+.stage{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:clamp(340px, 74vw, 1180px); height:clamp(340px, 84vh, 920px);
+  background:transparent; z-index:1;
+}
+.stage iframe{ width:100%; height:100%; border:0; display:block; pointer-events:none; }
+/* cross-fade/rise between drawings as the cycler swaps the source */
+.stage iframe.out{ animation:vizOut .6s var(--ease) forwards; }
+.stage iframe.in{ animation:vizIn .6s var(--ease); }
+@keyframes vizOut{ from{opacity:1; transform:translateY(0);} to{opacity:0; transform:translateY(-16px);} }
+@keyframes vizIn{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+
+/* corner annotations */
+.hc{ position:absolute; z-index:2; }
+.hc-tl{ top:clamp(18px,3vh,34px); left:clamp(18px,2.4vw,34px); max-width:min(300px,22%); }
+.hc-tr{ top:clamp(18px,3vh,34px); right:clamp(18px,2.4vw,34px); }
+.hc-bl{ bottom:clamp(18px,3vh,34px); left:clamp(18px,2.4vw,34px); max-width:min(280px,22%); }
+.hc-br{ bottom:clamp(18px,3vh,34px); right:clamp(18px,2.4vw,34px); width:min(352px,31%); }
+
+.hc-tl{ max-width:min(420px,34%); }
+.hc-tl h1{
+  margin:0; font-family:var(--font-display); font-weight:500;
+  font-size:clamp(40px,5vw,68px); line-height:0.94; letter-spacing:-0.028em; color:var(--ink);
+}
+.hc-tl h1 em{ font-style:normal; color:var(--accent); }
+.hc-tl .sub{ margin-top:20px; font-size:15px; line-height:1.6; color:var(--g700); max-width:38ch; }
+.hc-tl .sub b{ color:var(--ink); font-weight:600; }
+
+/* STUDIO box */
+.studio{
+  position:relative; display:block; width:188px; padding:16px 16px 14px;
+  border:1px solid var(--ink); background:var(--paper);
+  transition:background var(--d2),color var(--d2);
+}
+.studio .arr{
+  position:absolute; top:10px; right:12px; font-size:17px; line-height:1; color:var(--accent);
+  transition:transform var(--d2),color var(--d2);
+}
+.studio .st-m{ font-family:var(--font-display); font-weight:600; font-size:25px; letter-spacing:-0.01em; line-height:1; }
+.studio .st-s{ margin-top:6px; font-size:10.5px; letter-spacing:var(--tw1); text-transform:uppercase; color:var(--g500); }
+.studio:hover{ background:var(--ink); color:var(--paper); }
+.studio:hover .st-s{ color:var(--g300); }
+.studio:hover .arr{ color:var(--accent-soft); transform:translate(3px,-3px); }
+
+/* GAUDI agent box (bottom-left) */
+.hc-bl{ max-width:none; width:auto; }
+.gaudibox{
+  position:relative; display:inline-flex; align-items:center; gap:14px;
+  padding:12px 26px 12px 12px; border:1px solid var(--ink); background:var(--paper);
+  transition:background var(--d2),color var(--d2);
+}
+.gaudibox .arr{
+  position:absolute; top:10px; right:12px; font-size:17px; line-height:1; color:var(--accent);
+  transition:transform var(--d2),color var(--d2);
+}
+.gaudibox:hover .arr{ color:var(--accent-deep); transform:translate(3px,-3px); }
+/* hover: house-style diagonal hatch fill on paper (keeps the dark dots readable) */
+.gaudibox:hover{
+  background-color:var(--paper);
+  background-image:repeating-linear-gradient(45deg,
+    rgba(20,49,92,.14) 0, rgba(20,49,92,.14) 1px, transparent 1px, transparent 6px);
+}
+.gb-orb{ position:relative; top:4px; width:58px; height:58px; flex:none; overflow:visible;
+  animation:breathe 4.2s ease-in-out infinite; }
+/* keep the iframe interactive so the asteroid's own hover (darken/swell) + click fire */
+.gb-orb iframe{ width:100%; height:100%; border:0; display:block; background:transparent; }
+/* breathing float — smooth, anchored low: rises a little, settles slowly back to rest */
+@keyframes breathe{
+  0%,100% { transform:translateY(0); }   /* rest — the stable, lower end */
+  44%     { transform:translateY(-6px); } /* gentle float-up (fall is slower → bottom dwells) */
+}
+.gb-txt{ display:flex; flex-direction:column; justify-content:center; line-height:1; }
+.gb-k{ font-family:var(--font-sans); font-size:10.5px; letter-spacing:var(--tw1);
+  text-transform:uppercase; color:var(--g500); }
+.gb-m{ margin:3px 0; font-family:"Montserrat", var(--font-display), sans-serif; font-weight:600;
+  font-size:30px; letter-spacing:0.01em; line-height:1; color:var(--ink); }
+.gb-s{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:var(--tw1);
+  text-transform:uppercase; color:var(--accent); }
+
+/* client cycler */
+.clientbox{ border:1px solid var(--ink); background:var(--paper); margin-bottom:12px; }
+.clientbox .cb-top{ display:flex; align-items:center; justify-content:space-between; padding:7px 12px; border-bottom:1px solid var(--g200); }
+.clientbox .cb-top .label{ color:var(--accent); }
+.clientbox .cb-top .idx{ font-family:var(--font-mono); font-size:9.5px; color:var(--g500); }
+.clientbox .cb-body{ padding:13px 12px 14px; min-height:74px; }
+.clientbox .cb-cat{ font-family:var(--font-mono); font-size:8.5px; letter-spacing:var(--tw1); color:var(--accent); margin-bottom:6px; }
+.clientbox .cb-name{ font-family:var(--font-display); font-weight:500; font-size:18px; letter-spacing:-0.014em; line-height:1.04; color:var(--ink); transition:opacity .3s var(--ease); }
+.clientbox .cb-name.fade{ opacity:0; }
+
+/* design-consultant mark — logo + caption, nothing else */
+.markbox{
+  padding:16px 14px 14px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px;
+  border:1px solid var(--ink); background:var(--paper);
+}
+.markbox img{ width:100%; max-width:128px; height:auto; display:block; }
+.markbox .dc{ width:100%; padding-top:11px; border-top:1px solid var(--ink); text-align:center;
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:var(--tw1); text-transform:uppercase; color:var(--ink); }
+
+/* ════════════════ responsive ════════════════ */
+@media (max-width:880px){
+  .sheet{ height:auto; min-height:100vh; }
+  /* hero reflows to a column */
+  .hero .sheet-in{ overflow:visible; }
+  .hero-inner{ display:flex; flex-direction:column; gap:22px; padding:26px 20px 30px; height:auto; }
+  .hc,.stage{ position:static; inset:auto; transform:none; max-width:none; width:auto; }
+  .stage{ position:relative; order:1; height:54vh; min-height:340px; margin:6px 0 8px; }
+  .hc-tl{ order:0; } .hc-tr{ order:2; } .hc-bl{ order:3; } .hc-br{ order:4; width:auto; }
+  .hc-tr .studio{ width:100%; }
+  .gaudibox{ width:100%; }
+  .hc-tl{ max-width:none; }
+  .hc-tl .sub{ max-width:52ch; }
+}
+@media (prefers-reduced-motion:reduce){
+  html,body{ scroll-behavior:auto; }
+  .rise-stagger > *,.reveal,.gb-orb{ animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ SHEET 01 · HERO / COVER ════════════ -->
+<section class="sheet hero" id="s1">
+  <div class="sheet-in">
+    <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+    <div class="grid-bg"></div>
+
+    <div class="hero-inner">
+
+      <!-- central animated drawing — pure visualisation, no frame; cycles through drawings -->
+      <div class="stage" aria-label="Structural detailing visualisation">
+        <iframe id="viz" src="drawings/pier-cap.html" title="Structural detailing visualisation" tabindex="-1" scrolling="no" loading="eager"></iframe>
+      </div>
+
+      <!-- top-left: the line -->
+      <div class="hc hc-tl">
+        <h1 class="display">Engineering,<br><em>elevated.</em></h1>
+        <p class="sub">Advanced <b>artificial intelligence</b>, applied to the design and delivery of public civil infrastructure — from metro viaducts to long-span river crossings.</p>
+      </div>
+
+      <!-- top-right: studio -->
+      <div class="hc hc-tr">
+        <a class="studio" href="https://studio.akcanuv.com" aria-label="Enter the Studio — for members">
+          <span class="arr" aria-hidden="true">↗</span>
+          <div class="st-m">Studio</div>
+          <div class="st-s">for members →</div>
+        </a>
+      </div>
+
+      <!-- bottom-left: GAUDI agent -->
+      <div class="hc hc-bl">
+        <a class="gaudibox" href="https://gaudi.engineer" aria-label="Meet GAUDI — engineering AI agent">
+          <span class="arr" aria-hidden="true">↗</span>
+          <span class="gb-orb"><iframe src="assets/gaudi-mark.html" title="GAUDI" tabindex="-1" scrolling="no" loading="lazy"></iframe></span>
+          <span class="gb-txt">
+            <span class="gb-k">Meet</span>
+            <span class="gb-m">GAUDI</span>
+            <span class="gb-s">Engineering AI Agent</span>
+          </span>
+        </a>
+      </div>
+
+      <!-- bottom-right: clients + design consultant mark -->
+      <div class="hc hc-br">
+        <div class="clientbox" id="clientbox">
+          <div class="cb-top"><span class="label">Trusted by</span></div>
+          <div class="cb-body">
+            <div class="cb-cat mono" id="cbCat">GOV · METRO AUTHORITY</div>
+            <div class="cb-name display" id="cbName">Metro Railway, Kolkata</div>
+          </div>
+        </div>
+
+        <div class="markbox">
+          <img src="assets/logo.png" alt="AKC ANUV logo" />
+          <div class="dc">Design Consultant</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+/* ════════════ drawing visualisation cycler ════════════ */
+(function(){
+  const viz = document.getElementById('viz');
+  const DRAWINGS = [
+    'drawings/pier-cap.html',   // pier cap CP-774
+    'drawings/span-cross-section.html',      // span 56 — cross-section
+    'drawings/bridge-general-arrangement.html',      // bridge — general arrangement
+  ];
+  // each drawing autoplays on load (~7–9s); hold the finished view, then fade/rise to the next.
+  const HOLD = 11000;   // time per drawing
+  const FADE = 600;     // fade/rise duration (matches the CSS animations)
+  let i = 0;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // when a freshly-swapped drawing finishes loading, fade/rise it in
+  viz.addEventListener('load', ()=>{ viz.classList.remove('out'); viz.classList.add('in'); });
+  setInterval(()=>{
+    viz.classList.remove('in');
+    viz.classList.add('out');            // fade + rise the current drawing out
+    setTimeout(()=>{                      // once it's hidden, swap the source
+      i = (i+1) % DRAWINGS.length;
+      viz.src = DRAWINGS[i];              // 'load' handler then fades/rises the new one in
+    }, FADE);
+  }, HOLD);
+})();
+
+/* ════════════ data ════════════ */
+const CLIENTS = [
+  ["GOVERNMENT","Metro Railway, Kolkata"],
+  ["GOVERNMENT","Kolkata Metro Rail Corp. Ltd."],
+  ["GOVERNMENT","National Highway Authority of India"],
+  ["GOVERNMENT","Bangladesh Bridge Authority"],
+  ["GOVERNMENT","Oil and Natural Gas Corp."],
+  ["GOVERNMENT","Steel Authority of India Ltd."],
+  ["GOVERNMENT","Punjab State Power Corp. Ltd."],
+  ["GOVERNMENT","Eastern Railway"],
+  ["GOVERNMENT","Northeast Frontier Railways"],
+  ["GOVERNMENT","Rail Vikas Nigam Ltd."],
+  ["INDUSTRY","Afcons Infrastructure Ltd."],
+  ["INDUSTRY","Rahee Infratech Ltd."],
+  ["INDUSTRY","BRBA Infratech LLP"],
+  ["INDUSTRY","Gannon Dunkerley &amp; Co., Ltd"],
+  ["INDUSTRY","Dooars Construction Company"],
+  ["INDUSTRY","Mir Akhter Hossain Ltd."],
+  ["INDUSTRY","National Power Engineering Company"],
+  ["INDUSTRY","Development Consultants Pvt. Ltd."],
+  ["INDUSTRY","MVR Infra Projects Pvt. Ltd."],
+  ["INDUSTRY","Daroga Pradhan Construction Pvt. Ltd."],
+  ["INDUSTRY","B. Das Associates Pvt. Ltd."],
+  ["INDUSTRY","Constell Consultants Pvt. Ltd."],
+  ["INDUSTRY","M. N. Dastur &amp; Co."],
+  ["INDUSTRY","Macron Technology"],
+  ["INDUSTRY","Dangote Cement"],
+];
+
+/* ════════════ client cycler ════════════ */
+(function(){
+  const nameEl = document.getElementById('cbName');
+  const catEl  = document.getElementById('cbCat');
+  let i = 0;
+  function set(n){
+    catEl.innerHTML = CLIENTS[n][0];
+    nameEl.innerHTML = CLIENTS[n][1];
+  }
+  set(0);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setInterval(()=>{
+    i = (i+1) % CLIENTS.length;
+    if(reduce){ set(i); return; }
+    nameEl.classList.add('fade');
+    setTimeout(()=>{ set(i); nameEl.classList.remove('fade'); }, 300);
+  }, 2600);
+})();
+</script>
+</body>
+</html>
