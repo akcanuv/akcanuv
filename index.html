@@ -46,7 +46,7 @@
 *{box-sizing:border-box; border-radius:0 !important;}
 /* the deck — the document root is the scroll-snap container (sheets stack to 4×100vh).
    smooth scrolling is handled per-interaction in JS so deep-links jump instantly. */
-html{ scroll-snap-type:y mandatory; }
+html{ scroll-snap-type:y mandatory; overflow-x:hidden; }
 body{
   margin:0; background:var(--paper); color:var(--ink);
   font-family:var(--font-sans); font-size:13px; line-height:1.55;
@@ -101,8 +101,8 @@ a{ color:inherit; text-decoration:none; }
 
 /* ════════════════ deck / sheets ════════════════ */
 .sheet{
-  position:relative; width:100%;
-  min-height:100vh; height:100vh;
+  position:relative; width:var(--sheet-w,100vw);
+  min-height:var(--sheet-h,100vh); height:var(--sheet-h,100vh);
   scroll-snap-align:start; scroll-snap-stop:always;
   padding:var(--pad);
 }
@@ -241,6 +241,35 @@ a{ color:inherit; text-decoration:none; }
 </style>
 </head>
 <body>
+
+<!-- ════════════ responsive global scale ════════════
+     Scale the whole page uniformly with the window, so fixed-px chrome and
+     fluid clamps grow together on large/high-res screens — like baking in
+     browser zoom. Applied to <body> (not <html>) so it can't disturb the
+     media queries or the snap scroller. Runs before paint → no scale jump.
+
+     CSS `zoom` magnifies *after* layout, so a 100vh sheet would render at
+     scale×viewport and overflow. We counter that by sizing each sheet to
+     viewport ÷ scale (in px), so post-zoom it lands at exactly one screen. -->
+<script>
+(function(){
+  // calibration: 1440-wide → 1.00, 2560-wide (QHD) → 1.20, capped at 1.50.
+  var ANCHOR_W = 1440, GAIN = 0.2 / 1120, MIN = 1.0, MAX = 1.5, OFF = 900;
+  var de = document.documentElement;
+  function apply(){
+    var w = de.clientWidth, h = de.clientHeight;
+    // below the mobile reflow point the column layout stays at 1:1
+    var s = w < OFF ? 1 : Math.min(MAX, Math.max(MIN, 1 + (w - ANCHOR_W) * GAIN));
+    document.body.style.zoom = s;
+    // pre-divide the snap-sheet box so zoom renders it back to one viewport
+    de.style.setProperty('--sheet-w', (w / s) + 'px');
+    de.style.setProperty('--sheet-h', (h / s) + 'px');
+  }
+  apply();
+  addEventListener('resize', apply, {passive:true});
+  addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
 
 <!-- ════════════ SHEET 01 · HERO / COVER ════════════ -->
 <section class="sheet hero" id="s1">
