@@ -5,3 +5,6 @@
 # editor / OS junk
 *~
 Thumbs.db
+
+# node
+node_modules/
