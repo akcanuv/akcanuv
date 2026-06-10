@@ -127,7 +127,11 @@ a{ color:inherit; text-decoration:none; }
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
   width:clamp(340px, 74vw, 1180px); height:clamp(340px, 84vh, 920px);
   background:transparent; z-index:1;
+  transition:width var(--dr) var(--ease), height var(--dr) var(--ease);
 }
+/* wider drawings (bridge GA, pier cap) are width-constrained here — give them
+   a larger stage so they read at the same scale as the squarer cross-section */
+.stage.big{ width:clamp(360px, 84vw, 1360px); height:clamp(360px, 92vh, 1040px); }
 .stage iframe{ width:100%; height:100%; border:0; display:block; pointer-events:none; }
 /* cross-fade/rise between drawings as the cycler swaps the source */
 .stage iframe.out{ animation:vizOut .6s var(--ease) forwards; }
@@ -179,12 +183,6 @@ a{ color:inherit; text-decoration:none; }
   transition:transform var(--d2),color var(--d2);
 }
 .gaudibox:hover .arr{ color:var(--accent-deep); transform:translate(3px,-3px); }
-/* hover: house-style diagonal hatch fill on paper (keeps the dark dots readable) */
-.gaudibox:hover{
-  background-color:var(--paper);
-  background-image:repeating-linear-gradient(45deg,
-    rgba(20,49,92,.14) 0, rgba(20,49,92,.14) 1px, transparent 1px, transparent 6px);
-}
 .gb-orb{ position:relative; top:4px; width:58px; height:58px; flex:none; overflow:visible;
   animation:breathe 4.2s ease-in-out infinite; }
 /* keep the iframe interactive so the asteroid's own hover (darken/swell) + click fire */
@@ -198,7 +196,7 @@ a{ color:inherit; text-decoration:none; }
 .gb-k{ font-family:var(--font-sans); font-size:10.5px; letter-spacing:var(--tw1);
   text-transform:uppercase; color:var(--g500); }
 .gb-m{ margin:3px 0; font-family:"Montserrat", var(--font-display), sans-serif; font-weight:600;
-  font-size:30px; letter-spacing:0.01em; line-height:1; color:var(--ink); }
+  font-size:26px; letter-spacing:0.01em; line-height:1; color:var(--ink); }
 .gb-s{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:var(--tw1);
   text-transform:uppercase; color:var(--accent); }
 
@@ -253,7 +251,7 @@ a{ color:inherit; text-decoration:none; }
     <div class="hero-inner">
 
       <!-- central animated drawing — pure visualisation, no frame; cycles through drawings -->
-      <div class="stage" aria-label="Structural detailing visualisation">
+      <div class="stage big" aria-label="Structural detailing visualisation">
         <iframe id="viz" src="drawings/pier-cap.html" title="Structural detailing visualisation" tabindex="-1" scrolling="no" loading="eager"></iframe>
       </div>
 
@@ -309,11 +307,14 @@ a{ color:inherit; text-decoration:none; }
 /* ════════════ drawing visualisation cycler ════════════ */
 (function(){
   const viz = document.getElementById('viz');
+  const stage = viz.closest('.stage');
   const DRAWINGS = [
     'drawings/pier-cap.html',   // pier cap CP-774
     'drawings/span-cross-section.html',      // span 56 — cross-section
     'drawings/bridge-general-arrangement.html',      // bridge — general arrangement
   ];
+  // the wider drawings render on the larger stage; the squarer cross-section does not
+  const BIG = [true, false, true];
   // each drawing autoplays on load (~7–9s); hold the finished view, then fade/rise to the next.
   const HOLD = 11000;   // time per drawing
   const FADE = 600;     // fade/rise duration (matches the CSS animations)
@@ -326,6 +327,7 @@ a{ color:inherit; text-decoration:none; }
     viz.classList.add('out');            // fade + rise the current drawing out
     setTimeout(()=>{                      // once it's hidden, swap the source
       i = (i+1) % DRAWINGS.length;
+      stage.classList.toggle('big', BIG[i]);  // resize the stage to match the drawing
       viz.src = DRAWINGS[i];              // 'load' handler then fades/rises the new one in
     }, FADE);
   }, HOLD);
